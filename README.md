@@ -252,49 +252,36 @@ To use your fine-tuned model in Ollama (WSL2/Docker), follow these steps:
 
 ### 1. Merge LoRA Adapter with Base Model
 
-Create scripts/merge_lora.py:
-
-```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-import torch
-
-base_model_path = "./models/base/defog_sqlcoder-7b-2"
-lora_path = "./models/fine_tuned/sqlcoder-7b-2-qlora"
-output_path = "./models/merged/sqlcoder-7b-2-merged"
-
-model = AutoModelForCausalLM.from_pretrained(base_model_path, torch_dtype=torch.float16)
-model = PeftModel.from_pretrained(model, lora_path)
-model = model.merge_and_unload()  # Merge LoRA weights
-
-model.save_pretrained(output_path)
 tokenizer = AutoTokenizer.from_pretrained(base_model_path)
 tokenizer.save_pretrained(output_path)
-```
 
-Run:
+Run the merge script:
+
 ```sh
 python scripts/merge_lora.py
 ```
 
 ### 2. Convert the Merged Model to GGUF
 
-Clone llama.cpp and use its convert.py:
+
+Clone llama.cpp and use its convert_hf_to_gguf.py script:
 
 ```sh
-drive root dir i.e. E:\
 git clone https://github.com/ggerganov/llama.cpp.git
 cd llama.cpp
-python -m venv venv
 pip install -r requirements.txt
-python convert_hf_to_gguf.py E:/sql-slm-project/sql-slm-project/models/merged/sqlcoder-7b-2-merged --outfile E:/sql-slm-project/sql-slm-project/models/merged/sqlcoder-7b-2-merged.gguf
+python convert_hf_to_gguf.py <path-to-merged-model> --outfile <output-gguf-file>
 ```
 
 ### 3. Copy GGUF Model to Ollama Environment
 
+
 Move the .gguf file to a directory accessible by your Ollama Docker/WSL2 instance.
 
 ### 4. Create a Modelfile
+
+
+Create a Modelfile in the same directory as your .gguf file:
 
 ```
 FROM ./sqlcoder-7b-2-merged.gguf
@@ -303,6 +290,7 @@ PARAMETER temperature 0.1
 
 ### 5. Build and Run in Ollama
 
+
 ```sh
 ollama create my-sql-model -f Modelfile
 ollama run my-sql-model
@@ -310,9 +298,25 @@ ollama run my-sql-model
 
 ---
 
+
+---
+
+# Ollama Fine-Tuned Model Setup (WSL2)
+
+This section summarizes the Ollama deployment process for your fine-tuned model:
+
+1. Fine-tune your model using the provided scripts (see scripts/train_model.py or scripts/fine_tune.py).
+2. Merge your LoRA adapter with the base model using scripts/merge_lora.py.
+3. Copy the merged model to your WSL2 or Docker environment.
+4. Convert the merged Hugging Face model to GGUF using llama.cpp's convert_hf_to_gguf.py.
+5. Create a Modelfile referencing your .gguf file.
+6. Build and run your model in Ollama:
+
+	```sh
+	ollama create my-sql-model -f Modelfile
+	ollama run my-sql-model
+	```
+
+For advanced configuration, troubleshooting, and API usage, see the full ollama_config.md in your repo.
+
 **Happy SQL Generation! 🚀**
-
-
-
-
-cp E:/sql-slm-project/sql-slm-project/models/merged/*.gguf ./model.gguf
