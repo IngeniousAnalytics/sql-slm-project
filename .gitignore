@@ -1,0 +1,56 @@
+# Ignore Python cache and environment
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore data files
+/data/
+!/data/schemas/
+
+# Ignore model files (large files)
+/models/
+!/models/base/README.md
+!/models/fine_tuned/README.md
+!/models/checkpoints/README.md
+!/models/merged/README.md
+
+# Ignore temporary and output files
+tmp*
+*.tmp
+*.bak
+*.swp
+
+# Ignore environment and config files
+.env
+
+
+# Ignore Docker and VSCode files
+docker-compose.override.yml
+.vscode/
+
+# Ignore other large files
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.npy
+
+# Allow documentation
+!docs/
+
+# Allow scripts
+!scripts/
+
+# Allow source code
+!src/
